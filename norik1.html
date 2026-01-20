@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Norik | Telegram Stars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ffffff;
+            --secondary: #a0a0a0;
+            --accent: #6c63ff;
+            --accent-light: #8a84ff;
+            --bg-dark: #0a0a0f;
+            --bg-card: #11111f;
+            --border: #222233;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Звёздный фон с кометами */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .comet {
+            position: absolute;
+            width: 2px;
+            height: 120px;
+            background: linear-gradient(to bottom, transparent, rgba(108, 99, 255, 0.7), rgba(255, 255, 255, 0.9), transparent);
+            transform: rotate(-45deg);
+            filter: blur(1px);
+            opacity: 0;
+        }
+
+        .comet-tail {
+            position: absolute;
+            width: 1px;
+            height: 200px;
+            background: linear-gradient(to bottom, transparent, rgba(108, 99, 255, 0.4), transparent);
+            transform: rotate(-45deg);
+            filter: blur(1px);
+        }
+
+        /* Шапка и навигация */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            padding: 0.7rem 0;
+            background-color: rgba(10, 10, 15, 0.98);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Основной контент */
+        main {
+            margin-top: 80px;
+            padding-bottom: 4rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            text-align: center;
+            padding: 5rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            right: -100px;
+            bottom: -100px;
+            background: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: var(--accent-light);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .highlight {
+            color: var(--accent-light);
+            font-weight: 600;
+            background-color: rgba(108, 99, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .owner-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.15), rgba(108, 99, 255, 0.15));
+            color: #0088cc;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            border: 1px solid rgba(0, 136, 204, 0.3);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin: 3rem 0 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent);
+        }
+
+        .content-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .content-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(108, 99, 255, 0.15);
+            border-color: var(--accent-light);
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            padding: 2rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: var(--transition);
+            background-color: rgba(17, 17, 31, 0.7);
+        }
+
+        .feature-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            background-color: var(--bg-card);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .currency-card {
+            text-align: center;
+            padding: 4rem 3rem;
+            max-width: 800px;
+            margin: 3rem auto;
+            background: linear-gradient(135deg, rgba(17, 17, 31, 0.9), rgba(10, 10, 15, 0.9));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .currency-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(108, 99, 255, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .currency-icon {
+            font-size: 5rem;
+            color: #ffcc00;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 15px rgba(255, 204, 0, 0.3));
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--accent), #5753d4);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(108, 99, 255, 0.4);
+        }
+
+        .btn-telegram {
+            background: linear-gradient(135deg, #0088cc, #006699);
+        }
+
+        .btn-telegram:hover {
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.4);
+        }
+
+        .btn-disabled {
+            background: linear-gradient(135deg, #333344, #444455);
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-disabled:hover::before {
+            left: -100%;
+        }
+
+        .coming-soon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(108, 99, 255, 0.15);
+            color: var(--accent-light);
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            border: 1px solid rgba(108, 99, 255, 0.3);
+        }
+
+        .telegram-username {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0088cc;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        .price-note {
+            background-color: rgba(255, 204, 0, 0.1);
+            border-left: 4px solid #ffcc00;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .price-note h4 {
+            color: #ffcc00;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background-color: var(--bg-card);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 6rem 2rem 2rem;
+                transition: var(--transition);
+                border-left: 1px solid var(--border);
+                z-index: 1000;
+            }
+            
+            .nav-links.active {
+                right: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+                padding: 0 1rem;
+            }
+            
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-card {
+                padding: 1.8rem;
+            }
+            
+            .currency-card {
+                padding: 3rem 1.5rem;
+                margin: 2rem auto;
+            }
+            
+            .telegram-username {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .section-title {
+                font-size: 1.7rem;
+            }
+            
+            .btn {
+                padding: 0.9rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Футер */
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            color: var(--secondary);
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background-color: var(--bg-card);
+            border-radius: 50%;
+            color: var(--secondary);
+            font-size: 1.3rem;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .social-link:hover {
+            color: var(--accent);
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            background-color: rgba(108, 99, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Звёздный фон -->
+    <div id="starfield"></div>
+
+    <!-- Шапка с навигацией -->
+    <header id="mainHeader">
+        <div class="container nav-container">
+            <a href="#" class="logo">norik<span>.</span></a>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav class="nav-links" id="navLinks">
+                <a href="#" class="nav-link active" data-page="home">Главная</a>
+                <a href="#" class="nav-link" data-page="about">О проекте</a>
+                <a href="#" class="nav-link" data-page="stars">Telegram Stars</a>
+                <a href="#" class="nav-link" data-page="bot">Наш бот</a>
+                <a href="#" class="nav-link" data-page="contacts">Контакты</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="container">
+        <!-- Главная страница -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1>Norik — Telegram Stars</h1>
+                <div class="hero-subtitle">Официальная валюта в Telegram</div>
+                <p>Telegram Stars — это внутренняя валюта Telegram для покупок, чаевых и переводов. Получайте, обменивайте и используйте Stars через нашего бота.</p>
+                
+                <div style="margin: 2rem 0;">
+                    <div class="owner-tag">
+                        <i class="fas fa-crown"></i>
+                        Владелец проекта: @as33424
+                    </div>
+                </div>
+                
+                <a href="#" class="btn btn-telegram" data-page="contacts">
+                    <i class="fab fa-telegram"></i> Связаться с владельцем
+                </a>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="section-title">Что такое Telegram Stars?</h2>
+                <p><span class="highlight">Telegram Stars</span> — это официальная цифровая валюта внутри Telegram, которую можно использовать для различных целей:</p>
+                
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h3>Покупки в ботах</h3>
+                        <p>Оплачивайте товары и услуги в любых Telegram-ботах, которые поддерживают Stars.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3>Чаевые и подарки</h3>
+                        <p>Отправляйте Stars в качестве чаевых авторам каналов или подарков друзьям.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h3>Быстрые переводы</h3>
+                        <p>Переводите средства между пользователями мгновенно и без комиссий.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="section-title">Как получить Stars?</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;">1</div>
+                        <h3 style="margin-bottom: 0.5rem;">Связаться с владельцем</h3>
+                        <p>Напишите <span class="highlight">@as33424</span> в Telegram для консультации</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;">2</div>
+                        <h3 style="margin-bottom: 0.5rem;">Уточнить условия</h3>
+                        <p>Обсудите количество Stars и способ оплаты</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;">3</div>
+                        <h3 style="margin-bottom: 0.5rem;">Получить Stars</h3>
+                        <p>После оплаты получаете Stars на свой аккаунт Telegram</p>
+                    </div>
+                </div>
+                
+                <div class="price-note">
+                    <h4><i class="fas fa-info-circle"></i> Информация о ценах</h4>
+                    <p>Цены на Telegram Stars могут меняться в зависимости от курса и количества. Для получения актуальной информации о стоимости и условиях покупки, пожалуйста, свяжитесь напрямую с владельцем проекта.</p>
+                    <div style="margin-top: 1rem;">
+                        <div class="owner-tag" style="display: inline-flex;">
+                            <i class="fab fa-telegram"></i>
+                            @as33424
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- О проекте -->
+        <section id="about" class="page">
+            <div class="content-card">
+                <h2 class="section-title">О проекте Norik</h2>
+                <p>Norik — это официальный партнёрский проект по работе с Telegram Stars. Мы помогаем пользователям приобретать, использовать и обменивать внутреннюю валюту Telegram.</p>
+                
+                <p>Наша миссия — сделать использование Telegram Stars максимально простым и удобным для каждого пользователя мессенджера.</p>
+                
+                <h3 style="margin: 2rem 0 1rem;">Почему именно мы?</h3>
+                <ul style="padding-left: 1.5rem; margin-bottom: 1.5rem;">
+                    <li style="margin-bottom: 0.8rem; padding-left: 0.5rem;"><i class="fas fa-check" style="color: var(--accent); margin-right: 10px;"></i>Официальный доступ к Telegram Stars</li>
+                    <li style="margin-bottom: 0.8rem; padding-left: 0.5rem;"><i class="fas fa-check" style="color: var(--accent); margin-right: 10px;"></i>Прямое общение с владельцем проекта</li>
+                    <li style="margin-bottom: 0.8rem; padding-left: 0.5rem;"><i class="fas fa-check" style="color: var(--accent); margin-right: 10px;"></i>Безопасные и прозрачные сделки</li>
+                    <li style="margin-bottom: 0.8rem; padding-left: 0.5rem;"><i class="fas fa-check" style="color: var(--accent); margin-right: 10px;"></i>Поддержка 24/7</li>
+                    <li style="padding-left: 0.5rem;"><i class="fas fa-check" style="color: var(--accent); margin-right: 10px;"></i>Лучшие условия на рынке</li>
+                </ul>
+                
+                <div style="background-color: rgba(0, 136, 204, 0.05); padding: 1.5rem; border-radius: 10px; margin-top: 2rem; border: 1px solid rgba(0, 136, 204, 0.2);">
+                    <h4 style="color: #0088cc; margin-bottom: 0.5rem;"><i class="fas fa-shield-alt"></i> Безопасность</h4>
+                    <p>Все операции проводятся через официальные каналы Telegram. Мы гарантируем конфиденциальность и безопасность ваших сделок.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Telegram Stars -->
+        <section id="stars" class="page">
+            <div class="content-card">
+                <h2 class="section-title">Telegram Stars</h2>
+                <p>Telegram Stars — это универсальная валюта внутри экосистемы Telegram. Вот основные возможности её использования:</p>
+                
+                <div style="margin: 2.5rem 0;">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--accent-light);">Возможности использования:</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                        <div style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), transparent); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(108, 99, 255, 0.2);">
+                            <h4 style="color: var(--accent-light); margin-bottom: 0.8rem;"><i class="fas fa-robot" style="margin-right: 10px;"></i>Оплата в ботах</h4>
+                            <p>Покупайте цифровые товары, услуги и подписки в любых ботах, поддерживающих Stars.</p>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), transparent); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.2);">
+                            <h4 style="color: #ffc107; margin-bottom: 0.8rem;"><i class="fas fa-heart" style="margin-right: 10px;"></i>Поддержка авторов</h4>
+                            <p>Отправляйте Stars авторам каналов и создателям контента в качестве благодарности.</p>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), transparent); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(220, 53, 69, 0.2);">
+                            <h4 style="color: #dc3545; margin-bottom: 0.8rem;"><i class="fas fa-users" style="margin-right: 10px;"></i>Внутренние переводы</h4>
+                            <p>Переводите средства друзьям, партнёрам или сотрудникам внутри Telegram.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="price-note">
+                    <h4><i class="fas fa-money-bill-wave"></i> Уточнение цен</h4>
+                    <p>Стоимость Telegram Stars зависит от текущего курса и объёма покупки. Для получения индивидуального предложения и консультации по условиям, пожалуйста, свяжитесь с владельцем проекта.</p>
+                    <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <div class="owner-tag">
+                            <i class="fas fa-user-tie"></i>
+                            Владелец: @as33424
+                        </div>
+                        <a href="#" class="btn btn-telegram" data-page="contacts" style="padding: 0.7rem 1.5rem; font-size: 0.9rem;">
+                            <i class="fab fa-telegram"></i> Написать
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Наш бот -->
+        <section id="bot" class="page">
+            <div class="currency-card">
+                <div class="currency-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h2>Наш Telegram-бот</h2>
+                <p style="margin: 1rem 0 2rem; color: var(--secondary);">Специальный бот для работы с Telegram Stars. Покупайте, отслеживайте баланс и управляйте своими Stars через удобного бота.</p>
+                
+                <div style="margin: 2rem 0;">
+                    <div class="coming-soon">
+                        <i class="fas fa-tools" style="margin-right: 5px;"></i> Бот в разработке
+                    </div>
+                </div>
+                
+                <p style="margin-bottom: 2rem; font-size: 1.1rem;">Мы активно работаем над созданием удобного бота для управления Telegram Stars. Следите за обновлениями!</p>
+                
+                <p style="color: var(--secondary); margin-bottom: 1.5rem;">А пока вы можете приобрести Stars напрямую у владельца:</p>
+                
+                <div class="telegram-username">
+                    @as33424
+                </div>
+                
+                <a href="#" class="btn btn-telegram" data-page="contacts" style="margin-top: 1.5rem;">
+                    <i class="fab fa-telegram"></i> Перейти к контактам
+                </a>
+            </div>
+        </section>
+
+        <!-- Контакты -->
+        <section id="contacts" class="page">
+            <div class="content-card" style="text-align: center;">
+                <h2 class="section-title">Контакты</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 2rem;">Для покупки Telegram Stars и любой другой информации обращайтесь напрямую к владельцу проекта</p>
+                
+                <div style="margin: 3rem 0;">
+                    <div style="font-size: 4rem; color: #0088cc; margin-bottom: 1.5rem;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 0.5rem;">Владелец проекта</h3>
+                    <div class="telegram-username" style="font-size: 2rem; margin: 1rem 0 2rem;">
+                        @as33424
+                    </div>
+                    
+                    <p style="color: var(--secondary); max-width: 600px; margin: 0 auto 2rem;">
+                        По всем вопросам покупки Telegram Stars, сотрудничества или технической поддержки обращайтесь напрямую ко мне в Telegram. Отвечаю в течение 1-2 часов.
+                    </p>
+                    
+                    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+                        <a href="https://t.me/as33424" class="btn btn-telegram" target="_blank" style="min-width: 200px;">
+                            <i class="fab fa-telegram"></i> Написать в Telegram
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 2rem;">
+                    <p style="color: var(--secondary);"><i class="fas fa-clock"></i> Работаем 24/7 для вашего удобства</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <a href="#" class="logo" style="font-size: 2rem; margin-bottom: 1rem;">norik<span>.</span></a>
+            <p style="margin-bottom: 1rem;">Telegram Stars — официальная валюта Telegram</p>
+            
+            <div class="social-links">
+                <a href="https://t.me/as33424" class="social-link" target="_blank" title="Telegram">
+                    <i class="fab fa-telegram"></i>
+                </a>
+            </div>
+            
+            <p>&copy; 2026 Norik Stars Project. Все права защищены.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;">Проект специализируется на работе с Telegram Stars</p>
+        </div>
+    </footer>
+
+    <script>
+        // Создание звёздного фона с кометами
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const starsCount = 200;
+            const cometsCount = 12; // ЕЩЁ БОЛЬШЕ КОМЕТ!
+            
+            // Создаем звёзды
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                const opacity = Math.random() * 0.7 + 0.3;
+                star.style.opacity = opacity;
+                
+                if (Math.random() > 0.8) {
+                    star.style.backgroundColor = `rgba(108, 99, 255, ${opacity})`;
+                } else if (Math.random() > 0.9) {
+                    star.style.backgroundColor = `rgba(255, 204, 0, ${opacity})`;
+                }
+                
+                const duration = Math.random() * 5 + 3;
+                const delay = Math.random() * 5;
+                star.style.animation = `twinkle ${duration}s infinite alternate ${delay}s`;
+                
+                starfield.appendChild(star);
+            }
+            
+            // Создаем БОЛЬШЕ КОМЕТ
+            for (let i = 0; i < cometsCount; i++) {
+                createComet(i);
+            }
+            
+            function createComet(index) {
+                const comet = document.createElement('div');
+                comet.className = 'comet';
+                
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 100;
+                comet.style.left = `${startX}%`;
+                comet.style.top = `${startY}%`;
+                
+                const height = Math.random() * 120 + 80;
+                comet.style.height = `${height}px`;
+                
+                const hue = Math.random() * 40 + 230;
+                comet.style.background = `linear-gradient(to bottom, transparent, hsla(${hue}, 90%, 70%, 0.8), rgba(255, 255, 255, 0.9), transparent)`;
+                
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 15;
+                
+                comet.style.animation = `cometMove ${duration}s linear infinite ${delay}s`;
+                
+                const tail = document.createElement('div');
+                tail.className = 'comet-tail';
+                tail.style.left = `${startX}%`;
+                tail.style.top = `${startY}%`;
+                tail.style.height = `${height * 2.5}px`;
+                tail.style.background = `linear-gradient(to bottom, transparent, hsla(${hue}, 70%, 60%, 0.4), transparent)`;
+                tail.style.animation = `cometMove ${duration}s linear infinite ${delay - 0.3}s`;
+                
+                starfield.appendChild(comet);
+                starfield.appendChild(tail);
+                
+                setTimeout(() => {
+                    if (comet.parentNode) {
+                        comet.parentNode.removeChild(comet);
+                        tail.parentNode.removeChild(tail);
+                        createComet(index);
+                    }
+                }, (duration + delay) * 1000);
+            }
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes twinkle {
+                    0% { opacity: 0.3; transform: scale(1); }
+                    50% { opacity: 0.9; transform: scale(1.2); }
+                    100% { opacity: 0.3; transform: scale(1); }
+                }
+                
+                @keyframes cometMove {
+                    0% {
+                        transform: translateX(-1500px) translateY(-800px) rotate(-45deg);
+                        opacity: 0;
+                    }
+                    3% {
+                        opacity: 1;
+                    }
+                    92% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateX(1500px) translateY(800px) rotate(-45deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Навигация по страницам
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinksContainer = document.getElementById('navLinks');
+            const header = document.getElementById('mainHeader');
+            
+            function switchPage(pageId) {
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                const activePage = document.getElementById(pageId);
+                if (activePage) {
+                    activePage.classList.add('active');
+                }
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('data-page') === pageId) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                navLinksContainer.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page');
+                    switchPage(pageId);
+                });
+            });
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                navLinksContainer.classList.toggle('active');
+                mobileMenuBtn.innerHTML = navLinksContainer.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinksContainer.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!navLinksContainer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    navLinksContainer.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+            
+            switchPage('home');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        }
+        
+        // Плавное появление элементов
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.05,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.content-card, .feature-item, .currency-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        }
+        
+        // Адаптация
+        function handleResponsive() {
+            const navLinks = document.getElementById('navLinks');
+            
+            function checkWindowSize() {
+                if (window.innerWidth > 768) {
+                    navLinks.classList.remove('active');
+                    document.getElementById('mobileMenuBtn').innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            }
+            
+            window.addEventListener('resize', checkWindowSize);
+            checkWindowSize();
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            createStarfield();
+            initNavigation();
+            initScrollAnimations();
+            handleResponsive();
+            
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const stars = document.querySelectorAll('.star');
+                
+                stars.forEach((star, index) => {
+                    const speed = 0.1 + (index % 5) * 0.05;
+                    const yPos = -(scrolled * speed);
+                    star.style.transform = `translateY(${yPos}px) scale(${1 + speed * 0.1})`;
+                });
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.btn').forEach(btn => {
+                    btn.style.opacity = '1';
+                    btn.style.transform = 'translateY(0)';
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
